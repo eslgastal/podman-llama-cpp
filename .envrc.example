@@ -1,0 +1,37 @@
+# Example .envrc file
+
+##################################################
+# Build variables, used by ./podman-build-image.sh
+##################################################
+
+# NOTE: An nvidia/container with tag "${CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION}"
+# must exist in https://hub.docker.com/r/nvidia/cuda/tags, and $GCC_VERSION must exist
+# in the $UBUNTU_VERSION chosen.
+
+# CUDA toolkit version
+export CUDA_VERSION=12.4.1
+# Ubuntu version
+export UBUNTU_VERSION=22.04
+# GNU Compiler Collection version
+export GCC_VERSION=12
+
+###################################################
+# Runtime variables, used by ./podman-run-server.sh
+###################################################
+
+# Podman image to use for llama.cpp server
+export LLAMA_CPP_IMAGE=localhost/llama.cpp:server-cuda124-latest
+
+# Arguments to pass to llama.cpp image
+_LLAMA_CPP_ARGS=(
+    -hf 'unsloth/Qwen3.6-35B-A3B-GGUF:Q4_K_M' # Download this model from huggingface
+    -c 64000         # Model context size
+    --no-mmap        # Read all model into RAM/VRAM
+    -fa 1            # Flash attention
+    --host 0.0.0.0   # Run server bound to host network (NOTE: use a firewall!)
+    --port 8080      # Run server bound to port 8080
+)
+export LLAMA_CPP_ARGS="${_LLAMA_CPP_ARGS[@]}"
+
+# # Hugging Face authentication token (optional, gives higher rate limits)
+# export HF_TOKEN=your_hf_token_here
