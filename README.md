@@ -10,8 +10,14 @@
 
 ## Running pi coding agent
 
-1) Install https://pi.dev coding agent (NOTE: pi has no sandbox, better to run from container, see https://github.com/cjermain/pi-less-yolo)
-2) Create `~/.pi/agent/models.json` with contents (NOTE: use the same model id you used in .envrc):
+> [!CAUTION]
+> Pi has [no sandbox](https://mariozechner.at/posts/2025-11-30-pi-coding-agent/#toc_13) and allows the LLM to run **any command, including destructive ones,** on your system. For minimum security, it is better to run it from a container, see https://github.com/cjermain/pi-less-yolo .
+
+> [!NOTE]
+> In the `models.json` file, use the same model id you used in your `.envrc` file.
+
+1) Install https://pi.dev coding agent (NOTE: as mentioned above, better to run from a container)
+2) Create `~/.pi/agent/models.json` with contents:
     ```json
     {
     "providers": {
