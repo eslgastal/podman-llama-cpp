@@ -17,12 +17,19 @@ if [ -n "$HF_TOKEN" ]; then
     EXTRA_PODMAN_ARGS+=(--env HF_TOKEN="${HF_TOKEN}")
 fi
 
+if [ "$LLAMA_CPP_RUN_SHELL" == "1" ] || [ "$LLAMA_CPP_RUN_SHELL" == "true" ]; then
+    echo "Starting bash shell instead of running llama-server."
+    EXTRA_PODMAN_ARGS+=(--interactive --tty --entrypoint /bin/bash)
+    LLAMA_CPP_ARGS=()
+fi
+
 echo "Using image: "${LLAMA_CPP_IMAGE}""
-echo "Arguments:" "${LLAMA_CPP_ARGS[@]}"
+echo "Arguments:" "${LLAMA_CPP_ARGS[@]} ${@}"
 
 podman run --rm --device nvidia.com/gpu=all \
        -v llama-cpp-cache:/root/.cache \
        --network=host \
        "${EXTRA_PODMAN_ARGS[@]}" \
        "${LLAMA_CPP_IMAGE}" \
-       ${LLAMA_CPP_ARGS[@]}
+       ${LLAMA_CPP_ARGS[@]} \
+       "${@}"
