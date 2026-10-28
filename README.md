@@ -3,10 +3,11 @@
 ## Running the local LLM
 
 1) Clone this repo with `git clone --recurse-submodules <url>`
-2) Copy .envrc.example to .envrc and optionally edit the options
-3) Build the image with `source .envrc && ./podman-build-image.sh`
-4) Run the llama.cpp server with `source .envrc && ./podman-run-server.sh`
-5) Test the model by going to https://localhost:8080/
+2) Copy `.envrc.example` to `.envrc` and optionally edit the options (the example is tuned for an RTX 4070 GPU and i5-13600K CPU)
+3) *Optional:* for `--load-mode mlock` and `--prio 2`, run `sudo ./configure-linux-limits.sh`, then log out and back in so the limits take effect
+4) Build the image with `source .envrc && ./podman-build-image.sh`
+5) Run the llama.cpp server with `source .envrc && ./podman-run-server.sh` (binds to all host interfaces; use a firewall)
+6) Test the model at http://localhost:8080/
 
 ## Running pi coding agent
 
@@ -20,19 +21,19 @@
 2) Create `~/.pi/agent/models.json` with contents:
     ```json
     {
-    "providers": {
+      "providers": {
         "localhost": {
-        "baseUrl": "http://localhost:8080/v1",
-        "api": "openai-completions",
-        "apiKey": "none",
-        "models": [
+          "baseUrl": "http://localhost:8080/v1",
+          "api": "openai-completions",
+          "apiKey": "none",
+          "models": [
             {
-            "id": "unsloth/Qwen3.6-35B-A3B-GGUF:Q4_K_M",
+            "id": "byteshape/Qwen3.6-35B-A3B-MTP-GGUF:Qwen3.6-35B-A3B-IQ4_XS-4.19bpw.gguf",
             "input": ["text", "image"]
             }
-        ]
+          ]
         }
-    }
+      }
     }
     ```
 3) Now run pi.

@@ -24,12 +24,39 @@ export LLAMA_CPP_IMAGE=localhost/llama.cpp:server-cuda124-latest
 
 # Arguments to pass to llama.cpp image
 _LLAMA_CPP_ARGS=(
-    -hf 'unsloth/Qwen3.6-35B-A3B-GGUF:Q4_K_M' # Download this model from huggingface
-    -c 64000         # Model context size
-    --no-mmap        # Read all model into RAM/VRAM
-    -fa 1            # Flash attention
-    --host 0.0.0.0   # Run server bound to host network (NOTE: use a firewall!)
-    --port 8080      # Run server bound to port 8080
+    # Model selection
+    --hf-repo byteshape/Qwen3.6-35B-A3B-MTP-GGUF
+    --hf-file Qwen3.6-35B-A3B-IQ4_XS-4.19bpw.gguf
+    --alias byteshape/Qwen3.6-35B-A3B-MTP-GGUF:Qwen3.6-35B-A3B-IQ4_XS-4.19bpw.gguf
+    --mmproj-auto
+    # Qwen3.6 (coding) sampling defaults; clients can override per request.
+    --temp 0.6
+    --top-p 0.95
+    --top-k 20
+    --min-p 0.0
+    --presence-penalty 0.0
+    --repeat-penalty 1.0
+    # Inference and context
+    --spec-type draft-mtp
+    --spec-draft-n-max 3
+    --parallel 4
+    --ctx-size 131072
+    --kv-unified
+    --cache-type-k f16
+    --cache-type-v f16
+    --image-min-tokens 1024
+    # CPU, GPU, and memory tuning
+    --flash-attn on
+    --load-mode mlock
+    --threads 6
+    --ubatch-size 2048
+    --cpu-mask 0x555
+    --cpu-strict 1
+    --prio 2
+    --prio-batch 2
+    # Network settings
+    --host 0.0.0.0   # Exposes the server on the host network (use a firewall!)
+    --port 8080
 )
 export LLAMA_CPP_ARGS="${_LLAMA_CPP_ARGS[@]}"
 
