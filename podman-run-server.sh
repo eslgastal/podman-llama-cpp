@@ -1,5 +1,12 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
+if [ ! -f "$SCRIPT_DIR/llama-models.ini" ]; then
+  echo "Error: $SCRIPT_DIR/llama-models.ini is missing." >&2
+  exit 1
+fi
+
 if [ -z "$LLAMA_CPP_IMAGE" ]; then
   echo "Error: LLAMA_CPP_IMAGE is not defined." >&2
   exit 1
@@ -23,13 +30,16 @@ if [ "$LLAMA_CPP_RUN_SHELL" == "1" ] || [ "$LLAMA_CPP_RUN_SHELL" == "true" ]; th
     LLAMA_CPP_ARGS=()
 fi
 
-echo "Using image: "${LLAMA_CPP_IMAGE}""
-echo "Arguments:" "${LLAMA_CPP_ARGS[@]} ${@}"
+# .envrc exports arguments as a whitespace-separated string for this script.
+read -r -a SERVER_ARGS <<< "${LLAMA_CPP_ARGS:-}"
+echo "Using image: $LLAMA_CPP_IMAGE"
+echo "Arguments:" "${SERVER_ARGS[@]}" "$@"
 
 podman run --rm --device nvidia.com/gpu=all \
        -v llama-cpp-cache:/root/.cache \
+       -v "$SCRIPT_DIR/llama-models.ini:/app/llama-models.ini:ro,Z" \
        --network=host \
        "${EXTRA_PODMAN_ARGS[@]}" \
        "${LLAMA_CPP_IMAGE}" \
-       ${LLAMA_CPP_ARGS[@]} \
+       "${SERVER_ARGS[@]}" \
        "${@}"
